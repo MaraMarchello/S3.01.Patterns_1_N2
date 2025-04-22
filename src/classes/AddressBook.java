@@ -1,34 +1,42 @@
 package classes;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import constants.Country;
+import exceptions.UnsupportedCountryException;
 import interfaces.AddressFactory;
+import tascaS301N2.AddressFactoryProvider;
 
 public class AddressBook {
+
 	private List<Contact> contacts = new ArrayList<>();
-	private Map<String, AddressFactory> factoryMap = new HashMap<>();
+
+	private AddressFactoryProvider factoryProvider;
 
 	public AddressBook() {
-
-		registerFactory(new USAddressFactory());
-		registerFactory(new FrenchAddressFactory());
-	}
-
-	private void registerFactory(AddressFactory factory) {
-		factoryMap.put(factory.getCountryName().toLowerCase(), factory);
+		this.factoryProvider = AddressFactoryProvider.getInstance();
 	}
 
 	public void addContact(String name, String country, String street, String city, String postalCode, String region,
 			String areaCode, String phoneNumber) {
 
-		AddressFactory factory = factoryMap.get(country.toLowerCase());
+		AddressFactory factory = factoryProvider.getFactory(country);
 		if (factory == null) {
 			throw new IllegalArgumentException("Unsupported country: " + country);
 		}
 
+		Address address = factory.createAddress(street, city, postalCode, region);
+		PhoneNumber phone = factory.createPhoneNumber(areaCode, phoneNumber);
+
+		Contact contact = new Contact(name, address, phone, factory.getCountryName());
+		contacts.add(contact);
+	}
+
+	public void addContact(String name, Country country, String street, String city, String postalCode, String region,
+			String areaCode, String phoneNumber) {
+
+		AddressFactory factory = factoryProvider.getFactory(country);
 		Address address = factory.createAddress(street, city, postalCode, region);
 		PhoneNumber phone = factory.createPhoneNumber(areaCode, phoneNumber);
 
@@ -52,5 +60,9 @@ public class AddressBook {
 			}
 		}
 		return result;
+	}
+
+	public String[] getSupportedCountries() {
+		return factoryProvider.getSupportedCountries();
 	}
 }

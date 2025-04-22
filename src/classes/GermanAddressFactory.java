@@ -5,23 +5,23 @@ import exceptions.InvalidAddressException;
 import exceptions.InvalidPhoneNumberException;
 import interfaces.AddressFactory;
 
-public class FrenchAddressFactory implements AddressFactory {
+public class GermanAddressFactory implements AddressFactory {
 
 	@Override
 	public Address createAddress(String street, String city, String postalCode, String region) {
 		validatePostalCode(postalCode);
-		return new FrenchAddress(street, city, postalCode, region);
+		return new GermanAddress(street, city, postalCode, region);
 	}
 
 	@Override
 	public PhoneNumber createPhoneNumber(String areaCode, String number) {
 		validatePhoneNumber(areaCode, number);
-		return new FrenchPhoneNumber(areaCode, number);
+		return new GermanPhoneNumber(areaCode, number);
 	}
 
 	@Override
 	public Country getCountry() {
-		return Country.FRANCE;
+		return Country.GERMANY;
 	}
 
 	@Override
@@ -30,14 +30,7 @@ public class FrenchAddressFactory implements AddressFactory {
 			return false;
 		}
 
-		if (!postalCode.matches("\\d{5}")) {
-			return false;
-		}
-
-		String department = postalCode.substring(0, 2);
-		int deptNumber = Integer.parseInt(department);
-
-		return (deptNumber >= 1 && deptNumber <= 95) || (deptNumber >= 97 && deptNumber <= 98);
+		return postalCode.matches("\\d{5}");
 	}
 
 	@Override
@@ -46,24 +39,24 @@ public class FrenchAddressFactory implements AddressFactory {
 			return false;
 		}
 
-		if (!areaCode.matches("0[1-9]")) {
+		if (!areaCode.matches("\\d{2,5}")) {
 			return false;
 		}
 
-		return number.matches("\\d{8}");
+		return number.matches("\\d{4,12}");
 	}
 
 	private void validatePostalCode(String postalCode) {
 		if (!isValidPostalCode(postalCode)) {
 			throw new InvalidAddressException(getCountryName(), "postalCode", postalCode,
-					"French postal code must be 5 digits starting with a valid department code (01-95, 97-98)");
+					"German postal code (PLZ) must be 5 digits");
 		}
 	}
 
 	private void validatePhoneNumber(String areaCode, String number) {
 		if (!isValidPhoneNumber(areaCode, number)) {
-			throw new InvalidPhoneNumberException(getCountryName(), areaCode + number,
-					"French phone number must have a 1-2 digit area code starting with 0 and an 8-digit number");
+			throw new InvalidPhoneNumberException(getCountryName(), areaCode + "-" + number,
+					"German phone number must have a 2-5 digit area code and at least 4 digits for the local number");
 		}
 	}
 }

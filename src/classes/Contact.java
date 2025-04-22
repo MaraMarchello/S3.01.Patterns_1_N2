@@ -1,9 +1,13 @@
 package classes;
 
 public class Contact {
+
 	private String name;
+
 	private Address address;
+
 	private PhoneNumber phoneNumber;
+
 	private String country;
 
 	public Contact(String name, Address address, PhoneNumber phoneNumber, String country) {
@@ -44,6 +48,6 @@ public class Contact {
 	@Override
 	public String toString() {
 		return String.format("Contact: %s (%s)\nPhone: %s\nAddress:\n%s", name, country,
-				phoneNumber.getFormatedPhoneNumber(), address.getFormatedAddress());
+				phoneNumber.getFormattedPhoneNumber(), address.getFormattedAddress());
 	}
 }
